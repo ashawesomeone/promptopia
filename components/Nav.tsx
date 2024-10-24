@@ -2,14 +2,21 @@
 
 import Link from "next/link";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
 import { signIn, signOut, useSession, getProviders } from "next-auth/react";
 
 const Nav = () => {
   const { data: session } = useSession();
+  const router = useRouter();
 
   const [providers, setProviders] = useState<any>(null);
   const [toggleDropdown, setToggleDropdown] = useState(false);
+
+  const signOutUser = ()=> {
+    setToggleDropdown(false);
+    signOut();
+  }
 
   useEffect(() => {
     const setupProviders = async () => {
@@ -44,7 +51,7 @@ const Nav = () => {
             <button
               type="button"
               className="outline_btn"
-              onClick={() => signOut()}
+              onClick={signOutUser}
             >
               Sign Out
             </button>
@@ -108,10 +115,7 @@ const Nav = () => {
                 </Link>
                 <button
                   type="button"
-                  onClick={() => {
-                    setToggleDropdown(false);
-                    signOut();
-                  }}
+                  onClick={()=>signOutUser()}
                   className="mt-5 w-full black_btn"
                 >
                   Sign Out

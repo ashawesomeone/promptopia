@@ -3,9 +3,6 @@ import GoogleProvider from "next-auth/providers/google";
 import { ConnectToDB } from "@utils/database";
 import User from "@models/user";
 
-interface profileProps {
-    profile: any
-}
 interface sessionProps {
     session: any
 }
@@ -29,7 +26,7 @@ const handler = NextAuth({
             return session;
 
         },
-        async signIn({ profile }: profileProps) {
+        async signIn({ profile, account }: { profile?: any, account: any }) {
             try {
                 await ConnectToDB();
 

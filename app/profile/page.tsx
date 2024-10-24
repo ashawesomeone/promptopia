@@ -3,12 +3,14 @@
 import { useState, useEffect } from "react";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
+import { signIn, getProviders } from "next-auth/react";
 
 import Profile from "@components/Profile";
 
 const MyProfile = () => {
   const [posts, setPosts] = useState([]);
   const { data: session }: any = useSession();
+  const [providers, setProviders] = useState<any>(null);
   const router = useRouter();
 
   const handleEdit = (post: any) => {
@@ -27,7 +29,7 @@ const MyProfile = () => {
 
         const filteredPosts = posts.filter((p: any) => p._id !== post._id);
 
-        setPosts(filteredPosts)
+        setPosts(filteredPosts);
       } catch (error) {}
     }
   };
@@ -42,14 +44,42 @@ const MyProfile = () => {
     if (session?.user.id) fetchPosts();
   }, []);
 
+  useEffect(() => {
+    const setupProviders = async () => {
+      const response = await getProviders();
+      setProviders(response);
+    };
+
+    setupProviders();
+  }, []);
+
   return (
-    <Profile
-      name="My"
-      desc="Welcome to your personalized profile page"
-      data={posts}
-      handleEdit={handleEdit}
-      handleDelete={handleDelete}
-    />
+    <>
+      {session ? (
+        <Profile
+          name="My"
+          desc="Welcome to your personalized profile page"
+          data={posts}
+          handleEdit={handleEdit}
+          handleDelete={handleDelete}
+        />
+      ) : (
+        <div className="flex flex-col items-center">
+          <p className="desc-big mb-5">Oops, you forgot to sign in!</p>
+          {providers &&
+              Object.values(providers).map((provider: any) => (
+                <button
+                  type="button"
+                  key={provider.name}
+                  onClick={() => signIn(provider.id)}
+                  className="black_btn"
+                >
+                  Sign In
+                </button>
+              ))}
+        </div>
+      )}
+    </>
   );
 };
 
